@@ -39,6 +39,65 @@ class ModelAnnotationHelperCommand extends Command
 
     public function handle()
     {
+        $this->initParams();
+        $models = $this->getModels();
+        if (empty($models)) {
+            $this->error("请配置需要注解生成模型类或目录");
+        }
+        $this->info("已准备，即将处理的Model...");
+        $annotation=$this->genAnnotation($models);
+        dump($models);
+    }
+
+    public function initParams(){
+        $this->annotation = [];
+    }
+
+    /**
+     * 生成model注解
+     *
+     * @param array $models
+     */
+    public function genAnnotation(array $models){
+        foreach ($models as $class){
+            try{
+                if (class_exists($class)) {
+                    $reflectionClass = new \ReflectionClass($class);
+                    if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
+                        continue;
+                    }
+                    //过滤掉工具类
+                    if (!$reflectionClass->IsInstantiable()) {
+                        continue;
+                    }
+                    $model = $this->laravel->make($class);
+                    $this->genAnnotionFromTableColumn($model);
+                }else{
+                    $this->warn("类不存在 {$class}");
+                }
+                throw new \ErrorException("bbm");
+            }catch (\Throwable $t){
+                $this->error(sprintf("异常错误：%s \n位置: %d \n", $t->getMessage(), $t->getLine()));
+            }
+        }
+    }
+
+    public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model){
+        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
+        $schema = $model->getConnection()->getDoctrineSchemaManager($tableName);
+        $databasePlatform = $schema->getDatabasePlatform();
+        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+        $platformName = $databasePlatform->getName();
+        dd($schema);
+
+    }
+    /**
+     * 获取model文件
+     *
+     * @return array
+     */
+    protected function getModels()
+    {
         $config = $this->laravel['config']->get('dev-tool');
         $model = $this->option('model');
         $dir = $this->option('dir');
@@ -51,21 +110,11 @@ class ModelAnnotationHelperCommand extends Command
             $this->error("目录 不存在");
             exit(1);
         }
-        $models = $this->getModels($config, $model, $dir);
-        dd($models);
-        if (empty($models)) {
-            $this->error("请配置需要注解生成模型类或目录");
-            exit(2);
-        }
-    }
-
-    protected function getModels($config, $model, $dir)
-    {
         $ignoredModels = [];
         $autoModels = [];
         //获取需要清除的类
         if (!empty($config['model_annotation_helper']['ignored_dir'])) {
-            foreach ($config['model_annotation_helper']['auto_dir'] as $value) {
+            foreach ($config['model_annotation_helper']['ignored_dir'] as $value) {
                 $ignoredModels = array_merge($ignoredModels, $this->loadModelClassFromDir($value));
             }
         }
@@ -77,18 +126,18 @@ class ModelAnnotationHelperCommand extends Command
         //获取需要加载的类
         if (!empty($config['model_annotation_helper']['auto_dir'])) {
             foreach ($config['model_annotation_helper']['auto_dir'] as $value) {
-                $autoModels = array_merge($ignoredModels, $this->loadModelClassFromDir($value));
+                $autoModels = array_merge($autoModels, $this->loadModelClassFromDir($value));
             }
         }
-        //获取需要清除的model
+        //获取需要加载的model
         if (!empty($config['model_annotation_helper']['auto_model'])) {
-            $autoModels = array_merge($ignoredModels, $config['model_annotation_helper']['auto_model']);
+            $autoModels = array_merge($autoModels, $config['model_annotation_helper']['auto_model']);
         }
         if (!empty($model)) {
             array_push($autoModels, $model);
         }
         if (!empty($dir)) {
-            $autoModels = array_merge($ignoredModels, $this->loadModelClassFromDir($dir));
+            $autoModels = array_merge($autoModels, $this->loadModelClassFromDir($dir));
             array_push($autoModels, $model);
         }
         $autoModels = array_unique($autoModels);
@@ -96,6 +145,12 @@ class ModelAnnotationHelperCommand extends Command
         return array_filter(array_diff($autoModels, $ignoredModels));
     }
 
+    /**
+     * 加载目录的model
+     *
+     * @param string $dir
+     * @return array|int[]|string[]
+     */
     protected function loadModelClassFromDir(string $dir)
     {
         $models = [];
