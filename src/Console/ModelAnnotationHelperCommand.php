@@ -75,7 +75,6 @@ class ModelAnnotationHelperCommand extends Command
                 }else{
                     $this->warn("类不存在 {$class}");
                 }
-                throw new \ErrorException("bbm");
             }catch (\Throwable $t){
                 $this->error(sprintf("异常错误：%s \n位置: %d \n", $t->getMessage(), $t->getLine()));
             }
@@ -85,12 +84,23 @@ class ModelAnnotationHelperCommand extends Command
     public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model){
         $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
         $schema = $model->getConnection()->getDoctrineSchemaManager($tableName);
-        $databasePlatform = $schema->getDatabasePlatform();
-        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
-        $platformName = $databasePlatform->getName();
-        dd($schema);
+        $columns = $schema->listTableColumns($tableName);
+        if(!empty($columns)){
+            dd($columns);
+            foreach ($columns as $column){
+
+                $name = $column->getName();
+                $type = $this->resolveColumnType($column);
+            }
+        }
+        dd($databasePlatform);
+    }
+
+
+    public function resolveColumnType($column){
 
     }
+
     /**
      * 获取model文件
      *
