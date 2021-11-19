@@ -51,6 +51,9 @@ class ModelAnnotationHelperCommand extends Command
 
     public function initParams(){
         $this->annotation = [];
+        $this->dateColumnOfClass = class_exists(\Illuminate\Support\Facades\Date::class)
+            ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
+            : '\Illuminate\Support\Carbon';
     }
 
     /**
@@ -82,23 +85,59 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model){
-        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
-        $schema = $model->getConnection()->getDoctrineSchemaManager($tableName);
-        $columns = $schema->listTableColumns($tableName);
-        if(!empty($columns)){
-            dd($columns);
-            foreach ($columns as $column){
-
-                $name = $column->getName();
-                $type = $this->resolveColumnType($column);
-            }
-        }
-        dd($databasePlatform);
+        $resolve = $this->resolveColumnType($model);
     }
 
 
-    public function resolveColumnType($column){
-
+    protected function resolveColumnType($model)
+    {
+        $tableName = $model->getConnection()->getTablePrefix() . $model->getTable();
+        $schema = $model->getConnection()->getDoctrineSchemaManager($tableName);
+        $columns = $schema->listTableColumns($tableName);
+        $columnMaps = [];
+        if (!empty($columns)) {
+            foreach ($columns as $column) {
+                $name = $column->getName();
+                if (in_array($name, $model->getDates())) {
+                    $type = $this->dateColumnOfClass;
+                } else {
+                    $type = $column->getType()->getName();
+                    switch ($type) {
+                        case 'string':
+                        case 'text':
+                        case 'date':
+                        case 'time':
+                        case 'guid':
+                        case 'datetime':
+                        case 'decimal':
+                            $type = 'string';
+                            break;
+                        case 'integer':
+                        case 'bigint':
+                        case 'smallint':
+                            $type = 'integer';
+                            break;
+                        case 'boolean':
+                            $type = 'boolean';
+                            break;
+                        case 'float':
+                            $type = 'float';
+                            break;
+                        default:
+                            $type = 'mixed';
+                            break;
+                    }
+                }
+                $comment = $column->getComment();
+                //字段是否允许为空
+                $isNullable = $column->getNotnull();
+                $columnMaps[$column] = [
+                    'name' => $comment,
+                    'type' => $type,
+                    'comment' => $comment,
+                ];
+            }
+        }
     }
 
     /**
