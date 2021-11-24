@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Barryvdh\LaravelIdeHelper\Console;
@@ -45,12 +46,14 @@ class ModelAnnotationHelperCommand extends Command
             $this->error("请配置需要注解生成模型类或目录");
         }
         $this->info("已准备，即将处理的Model...");
-        $annotation=$this->genAnnotation($models);
+        $annotation = $this->genAnnotation($models);
         dump($models);
     }
 
-    public function initParams(){
+    public function initParams()
+    {
         $this->annotation = [];
+        $this->properties = [];
         $this->dateColumnOfClass = class_exists(\Illuminate\Support\Facades\Date::class)
             ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
             : '\Illuminate\Support\Carbon';
@@ -61,9 +64,10 @@ class ModelAnnotationHelperCommand extends Command
      *
      * @param array $models
      */
-    public function genAnnotation(array $models){
-        foreach ($models as $class){
-            try{
+    public function genAnnotation(array $models)
+    {
+        foreach ($models as $class) {
+            try {
                 if (class_exists($class)) {
                     $reflectionClass = new \ReflectionClass($class);
                     if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
@@ -75,16 +79,17 @@ class ModelAnnotationHelperCommand extends Command
                     }
                     $model = $this->laravel->make($class);
                     $this->genAnnotionFromTableColumn($model);
-                }else{
+                } else {
                     $this->warn("类不存在 {$class}");
                 }
-            }catch (\Throwable $t){
+            } catch (\Throwable $t) {
                 $this->error(sprintf("异常错误：%s \n位置: %d \n", $t->getMessage(), $t->getLine()));
             }
         }
     }
 
-    public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model){
+    public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model)
+    {
         $resolve = $this->resolveColumnType($model);
     }
 
@@ -131,12 +136,47 @@ class ModelAnnotationHelperCommand extends Command
                 $comment = $column->getComment();
                 //字段是否允许为空
                 $isNullable = $column->getNotnull();
-                $columnMaps[$column] = [
-                    'name' => $comment,
-                    'type' => $type,
-                    'comment' => $comment,
-                ];
+                $this->setProperty(
+                    $name,
+                    $this->getTypeInModel($model, $type),
+                    true,
+                    true,
+                    $comment,
+                    $isNullable
+                );
             }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string|null $type
+     * @param bool|null $read
+     * @param bool|null $write
+     * @param string|null $comment
+     * @param bool $nullable
+     */
+    protected function setProperty($name, $type = null, $read = null, $write = null, $comment = '', $nullable = false)
+    {
+        if (!isset($this->properties[$name])) {
+            $this->properties[$name] = array();
+            $this->properties[$name]['type'] = 'mixed';
+            $this->properties[$name]['read'] = false;
+            $this->properties[$name]['write'] = false;
+            $this->properties[$name]['comment'] = (string)$comment;
+        }
+        if ($type !== null) {
+            $newType = $type;
+            if ($nullable) {
+                $newType .= '|null';
+            }
+            $this->properties[$name]['type'] = $newType;
+        }
+        if ($read !== null) {
+            $this->properties[$name]['read'] = $read;
+        }
+        if ($write !== null) {
+            $this->properties[$name]['write'] = $write;
         }
     }
 
@@ -214,5 +254,4 @@ class ModelAnnotationHelperCommand extends Command
         }
         return $models;
     }
-
 }
