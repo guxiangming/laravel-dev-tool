@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Barryvdh\LaravelIdeHelper\Console;
+namespace Console;
 
 use Composer\Autoload\ClassMapGenerator;
 use Illuminate\Console\Command;
