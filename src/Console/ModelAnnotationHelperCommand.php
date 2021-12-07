@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace SheinPlm\LavavelDevTool\Console;
+namespace DevTool\LavavelDevTool\Console;
 
 use Barryvdh\Reflection\DocBlock;
 use Barryvdh\Reflection\DocBlock\Context;
