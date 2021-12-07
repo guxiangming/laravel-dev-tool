@@ -3,7 +3,6 @@
     "description": "model-annotation、ide-helper...",
     "keywords": ["model ide"],
     "type": "library",
-    "version": "1.0.0",
     "license": "MIT",
     "authors": [{
         "name": "chenzuming",
