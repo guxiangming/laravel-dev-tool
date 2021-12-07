@@ -3,7 +3,6 @@
     "description": "model-annotation、ide-helper...",
     "keywords": ["model ide"],
     "type": "library",
-    "version": "1.0.0",
     "license": "MIT",
     "authors": [{
         "name": "chenzuming",
@@ -11,7 +10,7 @@
     }],
     "require": {
         "php": ">=7.3.0",
-        "barryvdh/reflection-docblock": "~2.0.x-dev"
+        "barryvdh/reflection-docblock": "~2.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~7.0"
