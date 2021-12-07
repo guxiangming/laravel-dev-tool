@@ -115,7 +115,6 @@ class ModelAnnotationHelperCommand extends Command
                     $output .= $this->createPhpDocs($class);
                     $ignore[] = $class;
                     $this->nullableColumns = [];
-//                    dd($this->properties);
                 } else {
                     $this->warn("类不存在 {$class}");
                 }
@@ -173,7 +172,6 @@ class ModelAnnotationHelperCommand extends Command
                     if (!empty($name)) {
                         $reflection = new \ReflectionMethod($model, $method);
                         $args = $this->getParameters($reflection);
-                        //Remove the first ($query) argument
                         array_shift($args);
                         $builder = $this->getClassNameInDestinationFile(
                             $reflection->getDeclaringClass(),
@@ -196,7 +194,6 @@ class ModelAnnotationHelperCommand extends Command
                     !method_exists('Illuminate\Database\Eloquent\Model', $method)
                     && !Str::startsWith($method, 'get')
                 ) {
-                    //Use reflection to inspect the code, based on Illuminate/Support/SerializableClosure.php
                     $reflection = new \ReflectionMethod($model, $method);
 
                     if ($returnType = $reflection->getReturnType()) {
@@ -204,7 +201,6 @@ class ModelAnnotationHelperCommand extends Command
                             ? $returnType->getName()
                             : (string)$returnType;
                     } else {
-                        // php 7.x type or fallback to docblock
                         $type = (string)$this->getReturnTypeFromDocBlock($reflection);
                     }
 
@@ -241,10 +237,6 @@ class ModelAnnotationHelperCommand extends Command
                             if ($methodReflection->getNumberOfParameters()) {
                                 continue;
                             }
-
-                            // Adding constraints requires reading model properties which
-                            // can cause errors. Since we don't need constraints we can
-                            // disable them when we fetch the relation to avoid errors.
                             $relationObj = Relation::noConstraints(function () use ($model, $method) {
                                 return $model->$method();
                             });
@@ -400,6 +392,8 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
+     * 生成注解文件
+     * 
      * @param string $class
      * @return string
      */
@@ -533,7 +527,7 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
-     * Get method return type based on it DocBlock comment
+     * 反射获取返回类型
      *
      * @param \ReflectionMethod $reflection
      *
@@ -637,6 +631,8 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
+     * 设置属性
+     * 
      * @param string $name
      * @param string|null $type
      * @param bool|null $read
@@ -748,6 +744,8 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
+     * 获取类命名空间情况
+     * 
      * @param object|ReflectionClass $model
      * @param string $className
      * @return string
@@ -811,16 +809,11 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
-     * Determine a model classes' collection type.
-     *
-     * @see http://laravel.com/docs/eloquent-collections#custom-collections
      * @param string $className
      * @return string
      */
     protected function getCollectionClass($className)
     {
-        // Return something in the very very unlikely scenario the model doesn't
-        // have a newCollection() method.
         if (!method_exists($className, 'newCollection')) {
             return '\Illuminate\Database\Eloquent\Collection';
         }
@@ -831,7 +824,7 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
-     * Check if the relation is nullable
+     * 检测关联模型是否允许空
      *
      * @param string $relation
      * @param Relation $relationObj
@@ -899,7 +892,6 @@ class ModelAnnotationHelperCommand extends Command
      */
     public function getParameters($method)
     {
-        //Loop through the default values for paremeters, and make the correct output string
         $params = array();
         $paramsWithDefault = array();
         /** @var \ReflectionParameter $param */
