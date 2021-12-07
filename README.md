@@ -47,7 +47,10 @@ php artisan vendor:publish --tag=dev-tool-config
 3. php artisan model-annotation-helper:generate --dir="" //根据读取配置文件+指定目录生成注解
 4. php artisan model-annotation-helper:generate --dir="" --model="" //根据读取配置文件+指定目录生成注解+指定类生成注解 
 5. php artisan model-annotation-helper:generate --ignored-config=true --model="" --dir="" //忽略config配置只生成指定位置注解
-    
+
+# 注
+1. 生成的注解中的类中如果不存在引入情况，不会自动添加
+2. 每次扫描生成新的注解会兼容用户自定义的注释
 
 # todo
 1. 兼容内网环境
