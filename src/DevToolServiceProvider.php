@@ -12,7 +12,7 @@ class DevToolServiceProvider extends ServiceProvider{
             $configPath = __DIR__ . '/../config/dev-tool.php';
             $this->publishes([
                 $configPath => config_path('dev-tool.php'),
-            ],'config');
+            ],'dev-tool-config');
         }
     }
 

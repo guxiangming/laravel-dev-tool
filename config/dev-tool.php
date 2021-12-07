@@ -18,7 +18,6 @@ return [
         ],
         'ignored_dir'=>[
             //需要排除自动注解的model
-            "App\Models\Shooting",
         ],
     ],
 ];

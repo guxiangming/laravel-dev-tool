@@ -25,6 +25,9 @@ class ModelAnnotationHelperCommand extends Command
      * The name and signature of the console command.
      *
      * php artisan model-annotation-helper:generate
+     * php artisan model-annotation-helper:generate --model=""
+     * php artisan model-annotation-helper:generate --dir=""
+     * php artisan model-annotation-helper:generate --dir="" --model=""
      * php artisan model-annotation-helper:generate --ignored-config=true --model="" --dir="" 忽略config配置只生成指定位置
      *
      * @var string
