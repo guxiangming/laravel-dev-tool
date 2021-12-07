@@ -1,7 +1,7 @@
 {
     "name": "dev-tool/laravel-dev-tool",
-    "description": "model-annotation,ide-helper...",
-    "keywords": ["model、ide"],
+    "description": "model-annotation、ide-helper...",
+    "keywords": ["model ide"],
     "type": "library",
     "version": "1.0.0",
     "license": "MIT",
