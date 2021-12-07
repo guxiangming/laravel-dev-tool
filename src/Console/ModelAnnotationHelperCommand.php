@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DevTool\LavavelDevTool\Console;
+namespace SheinPlm\LavavelDevTool\Console;
 
 use Barryvdh\Reflection\DocBlock;
 use Barryvdh\Reflection\DocBlock\Context;
@@ -67,14 +67,15 @@ class ModelAnnotationHelperCommand extends Command
         $this->genAnnotation($models);
     }
 
-    public function initParams(){
+    public function initParams()
+    {
         $this->annotation = [];
         $this->properties = [];
         $this->methods = [];
         //是否默认覆盖
         $this->write = true;
-        $this->reset=false;
-        $this->phpstorm_noinspections =false;
+        $this->reset = false;
+        $this->phpstorm_noinspections = false;
         $this->dateColumnOfClass = class_exists(\Illuminate\Support\Facades\Date::class)
             ? '\\' . get_class(\Illuminate\Support\Facades\Date::now())
             : '\Illuminate\Support\Carbon';
@@ -85,12 +86,13 @@ class ModelAnnotationHelperCommand extends Command
      *
      * @param array $models
      */
-    public function genAnnotation(array $models){
+    public function genAnnotation(array $models)
+    {
         $output = "<?php
 \n\n";
         $hasDoctrine = interface_exists('Doctrine\DBAL\Driver');
-        foreach ($models as $class){
-            try{
+        foreach ($models as $class) {
+            try {
                 if (class_exists($class)) {
                     $reflectionClass = new \ReflectionClass($class);
                     if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
@@ -109,14 +111,14 @@ class ModelAnnotationHelperCommand extends Command
                     }
                     //
                     $this->getPropertiesFromMethods($model);
-                    $output                .= $this->createPhpDocs($class);
-                    $ignore[]              = $class;
+                    $output .= $this->createPhpDocs($class);
+                    $ignore[] = $class;
                     $this->nullableColumns = [];
 //                    dd($this->properties);
-                }else{
+                } else {
                     $this->warn("类不存在 {$class}");
                 }
-            }catch (\Throwable $t){
+            } catch (\Throwable $t) {
                 dump($t->getTraceAsString());
                 $this->error(sprintf("异常错误：%s \n位置: %d \n", $t->getMessage(), $t->getLine()));
             }
@@ -134,7 +136,9 @@ class ModelAnnotationHelperCommand extends Command
         if ($methods) {
             sort($methods);
             foreach ($methods as $method) {
-                if(in_array($method,['scopePaginateFilter','scopeSimplePaginateFilter','scopeWhereBeginsWith','scopeWhereEndsWith','scopeWhereLike'])){
+                if (in_array($method, [
+                    'scopePaginateFilter', 'scopeSimplePaginateFilter', 'scopeWhereBeginsWith', 'scopeWhereEndsWith', 'scopeWhereLike'
+                ])) {
                     continue;
                 }
                 if (
@@ -305,6 +309,7 @@ class ModelAnnotationHelperCommand extends Command
             }
         }
     }
+
     /**
      * 转换字段根据定义的类型
      *
@@ -366,7 +371,7 @@ class ModelAnnotationHelperCommand extends Command
 
 
     /**
-     * @param  string  $type
+     * @param string $type
      * @return string|null
      * @throws \ReflectionException
      */
@@ -525,6 +530,7 @@ class ModelAnnotationHelperCommand extends Command
 
         return $keyword;
     }
+
     /**
      * Get method return type based on it DocBlock comment
      *
@@ -549,7 +555,8 @@ class ModelAnnotationHelperCommand extends Command
         return $type;
     }
 
-    public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model){
+    public function genAnnotionFromTableColumn(\Illuminate\Database\Eloquent\Model $model)
+    {
         $resolve = $this->resolveColumnType($model);
     }
 
@@ -629,12 +636,12 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
-     * @param string      $name
+     * @param string $name
      * @param string|null $type
-     * @param bool|null   $read
-     * @param bool|null   $write
+     * @param bool|null $read
+     * @param bool|null $write
      * @param string|null $comment
-     * @param bool        $nullable
+     * @param bool $nullable
      */
     protected function setProperty($name, $type = null, $read = null, $write = null, $comment = '', $nullable = false)
     {
@@ -643,7 +650,7 @@ class ModelAnnotationHelperCommand extends Command
             $this->properties[$name]['type'] = 'mixed';
             $this->properties[$name]['read'] = false;
             $this->properties[$name]['write'] = false;
-            $this->properties[$name]['comment'] = (string) $comment;
+            $this->properties[$name]['comment'] = (string)$comment;
         }
         if ($type !== null) {
             $newType = $type;
@@ -661,7 +668,6 @@ class ModelAnnotationHelperCommand extends Command
     }
 
 
-
     /**
      * 获取model文件
      *
@@ -670,7 +676,7 @@ class ModelAnnotationHelperCommand extends Command
     protected function getModels()
     {
         $ignoredConfig = $this->option('ignored-config');
-        if(empty($ignoredConfig)){
+        if (empty($ignoredConfig)) {
             $config = $this->laravel['config']->get('dev-tool');
         }
         $model = $this->option('model');
@@ -749,8 +755,7 @@ class ModelAnnotationHelperCommand extends Command
     {
         $reflection = $model instanceof ReflectionClass
             ? $model
-            : new ReflectionObject($model)
-        ;
+            : new ReflectionObject($model);
 
         $className = trim($className, '\\');
         $writingToExternalFile = !$this->write;
@@ -761,15 +766,15 @@ class ModelAnnotationHelperCommand extends Command
         }
 
         $usedClassNames = $this->getUsedClassNames($reflection);
-        if(!empty($usedClassNames[$className])){
+        if (!empty($usedClassNames[$className])) {
             return $usedClassNames[$className];
         }
 
         $class = new \ReflectionClass($className);
         //兼容当前命名空间情况
         if ($reflection->getNamespaceName() == $class->getNamespaceName()) {
-           return str_replace($reflection->getNamespaceName().'\\','',$className);
-        }else{
+            return str_replace($reflection->getNamespaceName() . '\\', '', $className);
+        } else {
             return '\\' . $className;
         }
     }
@@ -787,7 +792,7 @@ class ModelAnnotationHelperCommand extends Command
     }
 
     /**
-     * @param object|ReflectionClass  $model
+     * @param object|ReflectionClass $model
      * @param string $type
      * @return string
      */
@@ -827,7 +832,7 @@ class ModelAnnotationHelperCommand extends Command
     /**
      * Check if the relation is nullable
      *
-     * @param string   $relation
+     * @param string $relation
      * @param Relation $relationObj
      *
      * @return bool
