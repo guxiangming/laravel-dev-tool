@@ -1,9 +1,9 @@
 <?php
 
-namespace DevTool\LavavelDevTool;
+namespace DevTool\LaravelDevTool;
 
 use Illuminate\Support\ServiceProvider;
-use DevTool\LavavelDevTool\Console\ModelAnnotationHelperCommand;
+use DevTool\LaravelDevTool\Console\ModelAnnotationHelperCommand;
 
 class DevToolServiceProvider extends ServiceProvider{
     

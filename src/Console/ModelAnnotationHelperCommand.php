@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DevTool\LavavelDevTool\Console;
+namespace DevTool\LaravelDevTool\Console;
 
 use Barryvdh\Reflection\DocBlock;
 use Barryvdh\Reflection\DocBlock\Context;
