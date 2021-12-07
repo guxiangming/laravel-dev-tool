@@ -4,10 +4,13 @@
 # 需求调查
 - 经过查找php生态已经有可用的注解生成工具，但功能存在缺陷，仅支持对数据库字段进行注解。针对复杂的laravel-model需要从关联模型、表字段、attribute、casts、scope等特性考虑。
 
-# 安装步骤
-1. 检测composer.json是否限制中央服务器下载,如果限制则需要开启 (后期考虑加入到内网环境)
+# 安装步骤 (目前仅支持本地使用)
+1. 检测composer.json是否限制中央服务器下载,如果限制则移除 (后期考虑加入到内网环境)
 ```code
+移除代码
+{
  "packagist.org": false =>  "packagist.org": true
+}
 ```
 2. 安装到开发依赖
 
@@ -48,9 +51,10 @@ php artisan vendor:publish --tag=dev-tool-config
 4. php artisan model-annotation-helper:generate --dir="" --model="" //根据读取配置文件+指定目录生成注解+指定类生成注解 
 5. php artisan model-annotation-helper:generate --ignored-config=true --model="" --dir="" //忽略config配置只生成指定位置注解
 
-# 注
+# 注意事项
 1. 生成的注解中的类中如果不存在引入情况，不会自动添加
 2. 每次扫描生成新的注解会兼容用户自定义的注释
+3. 请勿提交composer.json 
 
 # todo
 1. 兼容内网环境
