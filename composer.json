@@ -1,24 +1,24 @@
 {
-    "name": "shein-plm/laravel-dev-tool",
+    "name": "dev-tool/laravel-dev-tool",
     "description": "model-annotation,ide-helper...",
-    "keywords": ["model,ide,"],
+    "keywords": ["model,ide"],
     "type": "library",
     "version": "1.0",
     "license": "MIT",
     "authors": [{
         "name": "chenzuming",
-        "email": "chenzuming1@shein.com"
+        "email": "403502556@qq.com"
     }],
     "require": {
         "php": ">=7.3.0",
-        "laravel/framework": "^6.2"
+        "barryvdh/reflection-docblock": "~2.0.x-dev"
     },
     "require-dev": {
         "phpunit/phpunit": "~7.0"
     },
     "autoload": {
         "psr-4": {
-            "SheinPlm\\LavavelDevTool\\": "src/"
+            "DevTool\\LavavelDevTool\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -32,7 +32,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "SheinPLM\\LaravelDevTool\\DevToolServiceProvider"
+                "DevTool\\LaravelDevTool\\DevToolServiceProvider"
             ]
         }
     }

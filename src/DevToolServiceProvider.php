@@ -1,16 +1,19 @@
 <?php
 
-namespace SheinPlm\LavavelDevTool;
+namespace DevTool\LavavelDevTool;
 
 use Illuminate\Support\ServiceProvider;
-use SheinPlm\LavavelDevTool\Console\ModelAnnotationHelperCommand;
-use SheinPlm\LavavelDevTool\Console\ModelIdeHelperCommand;
+use DevTool\LavavelDevTool\Console\ModelAnnotationHelperCommand;
 
 class DevToolServiceProvider extends ServiceProvider{
-
-
+    
     public function boot(){
-
+        if ($this->app->runningInConsole()) {
+            $configPath = __DIR__ . '/../config/dev-tool.php';
+            $this->publishes([
+                $configPath => config_path('dev-tool.php'),
+            ],'config');
+        }
     }
 
     public function register()
