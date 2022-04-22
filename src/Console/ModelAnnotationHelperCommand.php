@@ -921,6 +921,7 @@ class ModelAnnotationHelperCommand extends Command
             }
             $paramsWithDefault[] = $paramStr;
         }
+        
         return $paramsWithDefault;
     }
 }
