@@ -1,0 +1,75 @@
+<?php
+return [
+    'openApi' => [
+        /*
+           |--------------------------------------------------------------------------
+           | 状态 已完成|未完成|不可靠|数据缺失|数据错误
+           |--------------------------------------------------------------------------
+         */
+        'x-status' => '已完成',
+        //名称摘要
+        'summary' => 'DummyName',
+        //标签分类
+        'tags' => ['初始化标签'],
+        //联系人
+        'x-contact' => [
+            'name' => 'dps',
+        ],
+        //响应时间
+        'x_responseTime' => 1200,
+        //描述
+        'description' => '',
+        //风险
+        'x_risk' => 0,
+        'x_realTags' => [],
+        'x-remarks' => '',
+        'consumes' => ['application/json'],
+        'produces' => ['*/*'],
+    ],
+    //请求默认值
+    'requestDefaultValue' => [],
+    //请求描述值
+    'requestDescribe' => [],
+    //请求header参数
+    'headerParams' => [
+        'Content-Type' => [
+            'description' => '',
+            'required' => true,
+            'type' => 'string',
+            'default' => 'application/json',
+        ],
+    ],
+    /**
+     * 响应体
+     * type 'string', 'integer', 'array', 'object', 'boolean',
+     * @return array[]
+     */
+    'response' => [
+        'description' => '',
+        'type' => 'object',
+        'is_array' => true,
+        '_properties' => [
+            'code' => [
+                'description' => '响应编码 成功：0',
+                'type' => 'string',
+                'required' => true,
+            ],
+            'msg' => [
+                'description' => '错误描述,成功：OK',
+                'type' => 'string',
+            ],
+            'info' => [
+                'description' => '结果',
+                'type' => 'object',
+                'is_array' => true,
+                'required' => true,
+                '_properties' => [
+                    'data' => [
+                        'description' => '数据',
+                        'type' => 'string',
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
