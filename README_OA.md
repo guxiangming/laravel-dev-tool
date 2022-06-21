@@ -46,7 +46,7 @@ php artisan vendor:publish --tag=dev-tool-config
         'license' => '',
         /** 【选填】仓库版本 */
         'repository_url' => 'gitlab',
-        /** 组间路由配置 */
+        /** 组件路由配置 */
         'routes' => [
             /** 文档输出路由 */
             'web' => 'open_api/api_docs',
